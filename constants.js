@@ -54,15 +54,15 @@ export const BLOCKCHAINS = {
     testnet: {
         // This is V8 TESTNET HUB don't use this for V6
         'base:84532': {
-            hubContract: '0xCdC3945ed33941e359391574aAB16F274D53e641',
+            hubContract: '0x3a38fC53a00C12a9883Cf8B61c8A76a88902f81C',
             rpc: 'https://sepolia.base.org',
         },
         'otp:20430': {
-            hubContract: '0x881449B372eB0eA34d0bF450839182dcC15A1dcA',
+            hubContract: '0x965C8970784B2c25Ca96F6D284e7E0e3AE6940d1',
             rpc: 'https://lofar-testnet.origin-trail.network',
         },
         'gnosis:10200': {
-            hubContract: '0xae1b378Ad5418ca437AceF78EDc8b40607eb5A1b',
+            hubContract: '0xC612946B0d4830F5D9f3DBD1cE0f5770183b07e1',
             rpc: 'https://rpc.chiadochain.net',
             gasPriceOracleLink: 'https://blockscout.chiadochain.net/api/v1/gas-price-oracle',
         },
