@@ -19,7 +19,7 @@ const ParanetKnowledgeMinersRegistryAbi = require('dkg-evm-module/abi/ParanetKno
 const IdentityStorageAbi = require('dkg-evm-module/abi/IdentityStorage.json');
 const KnowledgeCollectionAbi = require('dkg-evm-module/abi/KnowledgeCollection.json');
 const KnowledgeCollectionStorageAbi = require('dkg-evm-module/abi/KnowledgeCollectionStorage.json');
-const AskAbi = require('dkg-evm-module/abi/Ask.json');
+const AskStorageAbi = require('dkg-evm-module/abi/AskStorage.json');
 const ChronosAbi = require('dkg-evm-module/abi/Chronos.json');
 
 export default class BlockchainServiceBase {
@@ -43,7 +43,7 @@ export default class BlockchainServiceBase {
         this.abis.IdentityStorage = IdentityStorageAbi;
         this.abis.KnowledgeCollection = KnowledgeCollectionAbi;
         this.abis.KnowledgeCollectionStorage = KnowledgeCollectionStorageAbi;
-        this.abis.Ask = AskAbi;
+        this.abis.AskStorage = AskStorageAbi;
         this.abis.Chronos = ChronosAbi;
 
         this.abis.KnowledgeCollectionStorage.filter((obj) => obj.type === 'event').forEach(
@@ -1081,7 +1081,12 @@ export default class BlockchainServiceBase {
     // Get ask operations
     // To get price, multiply with size in bytes and epochs
     async getStakeWeightedAverageAsk(blockchain) {
-        return this.callContractFunction('Ask', 'getStakeWeightedAverageAsk', [], blockchain);
+        return this.callContractFunction(
+            'AskStorage',
+            'getStakeWeightedAverageAsk',
+            [],
+            blockchain,
+        );
     }
 
     // Blockchain operations
