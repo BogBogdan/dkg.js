@@ -1068,7 +1068,6 @@ export default class AssetOperationsManager {
             hashFunctionId,
             paranetUAL,
         );
-        console.log(getOperationId);
 
         const getOperationResult = await this.nodeApiService.getOperationResult(
             endpoint,
