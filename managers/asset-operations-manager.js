@@ -481,12 +481,20 @@ export default class AssetOperationsManager {
             const stakeWeightedAverageAsk = await this.blockchainService.getStakeWeightedAverageAsk(
                 blockchain,
             );
+
             estimatedPublishingCost =
                 (BigInt(stakeWeightedAverageAsk) *
                     (BigInt(epochsNum) * BigInt(1e18) +
                         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
                     BigInt(datasetSize)) /
                 BigInt(1e18);
+
+            // estimatedPublishingCost =
+            // (BigInt(stakeWeightedAverageAsk) *
+            //     (BigInt(epochsNum) * BigInt(1e18) +
+            //         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
+            //     (BigInt(datasetSize) / BigInt(1024))) /
+            // BigInt(1e18);
         }
         let knowledgeCollectionId;
         let mintKnowledgeAssetReceipt;
@@ -1067,6 +1075,7 @@ export default class AssetOperationsManager {
             hashFunctionId,
             paranetUAL,
         );
+        console.log(getOperationId);
 
         const getOperationResult = await this.nodeApiService.getOperationResult(
             endpoint,
