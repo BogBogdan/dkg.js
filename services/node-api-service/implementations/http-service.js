@@ -303,7 +303,7 @@ export default class HttpService {
         } while (
             response.data.status !== OPERATION_STATUSES.COMPLETED &&
             response.data.status !== OPERATION_STATUSES.FAILED &&
-            !response.data.minAcksReached
+            !response.data.data.minAcksReached
         );
         return response.data;
     }

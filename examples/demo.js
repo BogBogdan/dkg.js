@@ -2,29 +2,22 @@ import jsonld from 'jsonld';
 import DKG from '../index.js';
 import { sleepForMilliseconds } from '../services/utilities.js';
 
-const ENVIRONMENT = 'testnet';
-const OT_NODE_HOSTNAME = 'https://v6-pegasus-node-01.origin-trail.network';
+const ENVIRONMENT = 'development';
+const OT_NODE_HOSTNAME = 'http://localhost';
 const OT_NODE_PORT = '8900';
-const PUBLIC_KEY = '0x2061ffCc5d7fdbb8AD001042f9d1890CEa7F4C1c';
-const PRIVATE_KEY = '7648b942aee556c4c9b2dd1438fd539218b2f0c88a1dfbbea16b0bc242cf9ac1';
-
-// const ENVIRONMENT = 'development';
-// const OT_NODE_HOSTNAME = 'http://localhost';
-// const OT_NODE_PORT = '8900';
-// const PUBLIC_KEY = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
-// const PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+const PUBLIC_KEY = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+const PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
 const DkgClient = new DKG({
     environment: ENVIRONMENT,
     endpoint: OT_NODE_HOSTNAME,
     port: OT_NODE_PORT,
     blockchain: {
-        name: 'gnosis:10200', // otp:20430 gnosis:10200, base:84532
-        // name: 'hardhat1',
+        name: 'hardhat1',
         publicKey: PUBLIC_KEY,
         privateKey: PRIVATE_KEY,
     },
-    maxNumberOfRetries: 30,
+    maxNumberOfRetries: 300,
     frequency: 2,
     contentType: 'all',
     nodeApiVersion: '/v1',
@@ -124,15 +117,15 @@ function divider() {
 
     // divider();
 
-    console.time('Publish (5 replications, 5 finalizations)');
-    const result3 = await DkgClient.asset.create(content, {
-        epochsNum: 2,
-        minimumNumberOfFinalizationConfirmations: 3,
-        minimumNumberOfNodeReplications: 3,
-    });
-    console.timeEnd('Publish (5 replications, 5 finalizations)');
+    // console.time('Publish (5 replications, 5 finalizations)');
+    // const result3 = await DkgClient.asset.create(content, {
+    //     epochsNum: 2,
+    //     minimumNumberOfFinalizationConfirmations: 3,
+    //     minimumNumberOfNodeReplications: 3,
+    // });
+    // console.timeEnd('Publish (5 replications, 5 finalizations)');
 
-    console.log(JSON.stringify(result3, null, 2));
+    // console.log(JSON.stringify(result3, null, 2));
 
     // divider();
 
@@ -149,12 +142,13 @@ function divider() {
     // const publishFinalityResult = await DkgClient.graph.publishFinality(createAssetResult.UAL);
     // console.log('======================== ASSET FINALITY');
     // console.log(publishFinalityResult);
-
+    console.time('get');
     const getOperationResult = await DkgClient.graph.get(
-        'did:dkg:otp:20430/0xb4c24fc54bc811c2659c477b65da8648e499fd39/1',
+        'did:dkg:base:84532/0xd5550173b0f7b8766ab2770e4ba86caf714a5af5/2',
     );
     console.log('======================== ASSET GET');
     console.log(getOperationResult);
+    console.timeEnd('get');
 
     // divider();
 

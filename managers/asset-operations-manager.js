@@ -444,7 +444,7 @@ export default class AssetOperationsManager {
 
         if (
             publishOperationResult.status !== OPERATION_STATUSES.COMPLETED &&
-            !publishOperationResult.minAcksReached
+            !publishOperationResult.data.minAcksReached
         ) {
             return {
                 datasetRoot,
