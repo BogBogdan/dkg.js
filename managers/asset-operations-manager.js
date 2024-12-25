@@ -481,12 +481,12 @@ export default class AssetOperationsManager {
             const stakeWeightedAverageAsk = await this.blockchainService.getStakeWeightedAverageAsk(
                 blockchain,
             );
-
             estimatedPublishingCost =
                 (BigInt(stakeWeightedAverageAsk) *
                     (BigInt(epochsNum) * BigInt(1e18) +
                         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
-                    (BigInt(datasetSize) / BigInt(1024))) /
+                    BigInt(datasetSize)) /
+                BigInt(1024) /
                 BigInt(1e18);
         }
         let knowledgeCollectionId;
