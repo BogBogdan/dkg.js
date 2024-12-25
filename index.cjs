@@ -885,15 +885,8 @@ class AssetOperationsManager {
                 (BigInt(stakeWeightedAverageAsk) *
                     (BigInt(epochsNum) * BigInt(1e18) +
                         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
-                    BigInt(datasetSize)) /
+                    (BigInt(datasetSize) / BigInt(1024))) /
                 BigInt(1e18);
-
-            // estimatedPublishingCost =
-            // (BigInt(stakeWeightedAverageAsk) *
-            //     (BigInt(epochsNum) * BigInt(1e18) +
-            //         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
-            //     (BigInt(datasetSize) / BigInt(1024))) /
-            // BigInt(1e18);
         }
         let knowledgeCollectionId;
         let mintKnowledgeAssetReceipt;
