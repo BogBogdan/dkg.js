@@ -228,12 +228,13 @@ const DEFAULT_PARAMETERS = {
 };
 
 const DEFAULT_GAS_PRICE = {
-    GNOSIS: '20',
-    OTP: '1',
+    GNOSIS: '6',
+    OTP: '0.001',
+    BASE: '0.086',
 };
 
-const DEFAULT_GAS_PRICE_GWEI = {
-    GNOSIS: '3500000000',
+const DEFAULT_GAS_PRICE_WEI = {
+    GNOSIS: '6000000000',
 };
 
 const LOW_BID_SUGGESTION = 'low';
@@ -906,7 +907,6 @@ class AssetOperationsManager {
                 BigInt(1024) /
                 BigInt(1e18);
         }
-
         let knowledgeCollectionId;
         let mintKnowledgeAssetReceipt;
 
@@ -933,16 +933,6 @@ class AssetOperationsManager {
                 blockchain,
                 stepHooks,
             ));
-
-        const datasetSizeKB = datasetSize / 1024;
-
-        console.log(
-            `Blockchain: ${blockchain.name}\n` +
-                `Epochs num: ${epochsNum}\n` +
-                `Tx hash: ${mintKnowledgeAssetReceipt.transactionHash}\n` +
-                `Dataset Size KB: ${datasetSizeKB}\n` +
-                `Knowledge Assets Amount: ${assertionTools.kcTools.countDistinctSubjects(dataset.public)}`,
-        );
 
         const UAL = deriveUAL(blockchain.name, contentAssetStorageAddress, knowledgeCollectionId);
 
@@ -3194,34 +3184,38 @@ class BlockchainServiceBase {
         try {
             let gasPrice;
 
-            if (blockchain.name.startsWith('otp')) {
+            if (blockchain.name.startsWith('otpp')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
-            } else if (blockchain.name.startsWith('base')) {
+            } else if (blockchain.name.startsWith('basee')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
-            } else if (blockchain.name.startsWith('gnosis')) {
+            } else if (blockchain.name.startsWith('gnosiss')) {
                 try {
                     const response = await axios.get(blockchain.gasPriceOracleLink);
-                    gasPrice = Number(response?.data?.average) * 1e9;
+                    gasPrice =
+                        Number(response?.data?.average) * 1e9 || DEFAULT_GAS_PRICE_WEI.GNOSIS;
                 } catch (e) {
-                    gasPrice = DEFAULT_GAS_PRICE_GWEI.GNOSIS;
+                    gasPrice = DEFAULT_GAS_PRICE_WEI.GNOSIS;
                 }
             } else {
-                gasPrice = Web3.utils.toWei(
-                    blockchain.name.startsWith('otp')
-                        ? DEFAULT_GAS_PRICE.OTP
-                        : DEFAULT_GAS_PRICE.GNOSIS,
-                    'Gwei',
-                );
+                if (blockchain.name.startsWith('otp')) {
+                    gasPrice = Web3.utils.toWei(DEFAULT_GAS_PRICE.OTP, 'Gwei');
+                } else if (blockchain.name.startsWith('base')) {
+                    gasPrice = Web3.utils.toWei(DEFAULT_GAS_PRICE.BASE, 'Gwei');
+                } else {
+                    gasPrice = Web3.utils.toWei(DEFAULT_GAS_PRICE.GNOSIS, 'Gwei');
+                }
             }
             return gasPrice;
         } catch (error) {
             // eslint-disable-next-line no-console
             console.warn(
-                `Failed to fetch the gas price from the network: ${error}. Using default value: 2 Gwei.`,
+                `Failed to fetch the gas price from the network: ${error}. Using default value.`,
             );
             return Web3.utils.toWei(
                 blockchain.name.startsWith('otp')
                     ? DEFAULT_GAS_PRICE.OTP
+                    : blockchain.name.startsWith('base')
+                    ? DEFAULT_GAS_PRICE.BASE
                     : DEFAULT_GAS_PRICE.GNOSIS,
                 'Gwei',
             );
@@ -3310,7 +3304,7 @@ class BlockchainServiceBase {
                 to: contractInstance.options.address,
                 data: encodedABI,
                 from: publicKey,
-                gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
+                gasPrice,
                 gas: gasLimit,
             });
         }
@@ -3319,7 +3313,7 @@ class BlockchainServiceBase {
             from: publicKey,
             to: contractInstance.options.address,
             data: encodedABI,
-            gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
+            gasPrice,
             gas: gasLimit,
         };
     }
@@ -4205,12 +4199,12 @@ class BlockchainServiceBase {
             return gasPrice;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.warn(
-                `Failed to fetch the gas price from the network: ${error}. Using default value: 2 Gwei.`,
-            );
+            console.warn(`Failed to fetch the gas price from the network: ${error}. `);
             return Web3.utils.toWei(
                 blockchain.name.startsWith('otp')
                     ? DEFAULT_GAS_PRICE.OTP
+                    : blockchain.name.startsWith('base')
+                    ? DEFAULT_GAS_PRICE.BASE
                     : DEFAULT_GAS_PRICE.GNOSIS,
                 'Gwei',
             );

@@ -250,12 +250,13 @@ export const DEFAULT_PARAMETERS = {
 };
 
 export const DEFAULT_GAS_PRICE = {
-    GNOSIS: '20',
-    OTP: '1',
+    GNOSIS: '6',
+    OTP: '0.001',
+    BASE: '0.086',
 };
 
-export const DEFAULT_GAS_PRICE_GWEI = {
-    GNOSIS: '3500000000',
+export const DEFAULT_GAS_PRICE_WEI = {
+    GNOSIS: '6000000000',
 };
 
 export const LOW_BID_SUGGESTION = 'low';
