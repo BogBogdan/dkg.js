@@ -117,8 +117,12 @@ export default class BlockchainServiceBase {
             } else if (blockchain.name.startsWith('base')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
             } else if (blockchain.name.startsWith('gnosis')) {
-                const response = await axios.get(blockchain.gasPriceOracleLink);
-                gasPrice = Number(response.data.average) * 1e9;
+                try {
+                    const response = await axios.get(blockchain.gasPriceOracleLink);
+                    gasPrice = Number(response.data.average) * 1e9;
+                } catch (e) {
+                    gasPrice = DEFAULT_GAS_PRICE_GWEI.GNOSIS;
+                }
             } else {
                 gasPrice = Web3.utils.toWei(
                     blockchain.name.startsWith('otp')

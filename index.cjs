@@ -906,6 +906,7 @@ class AssetOperationsManager {
                 BigInt(1024) /
                 BigInt(1e18);
         }
+
         let knowledgeCollectionId;
         let mintKnowledgeAssetReceipt;
 
@@ -932,6 +933,16 @@ class AssetOperationsManager {
                 blockchain,
                 stepHooks,
             ));
+
+        const datasetSizeKB = datasetSize / 1024;
+
+        console.log(
+            `Blockchain: ${blockchain.name}\n` +
+                `Epochs num: ${epochsNum}\n` +
+                `Tx hash: ${mintKnowledgeAssetReceipt.transactionHash}\n` +
+                `Dataset Size KB: ${datasetSizeKB}\n` +
+                `Knowledge Assets Amount: ${assertionTools.kcTools.countDistinctSubjects(dataset.public)}`,
+        );
 
         const UAL = deriveUAL(blockchain.name, contentAssetStorageAddress, knowledgeCollectionId);
 
@@ -3188,8 +3199,12 @@ class BlockchainServiceBase {
             } else if (blockchain.name.startsWith('base')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
             } else if (blockchain.name.startsWith('gnosis')) {
-                const response = await axios.get(blockchain.gasPriceOracleLink);
-                gasPrice = Number(response.data.average) * 1e9;
+                try {
+                    const response = await axios.get(blockchain.gasPriceOracleLink);
+                    gasPrice = Number(response.data.average) * 1e9;
+                } catch (e) {
+                    gasPrice = DEFAULT_GAS_PRICE_GWEI.GNOSIS;
+                }
             } else {
                 gasPrice = Web3.utils.toWei(
                     blockchain.name.startsWith('otp')
