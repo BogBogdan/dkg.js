@@ -3,7 +3,11 @@
 import Web3 from 'web3';
 import axios from 'axios';
 import { createRequire } from 'module';
-import { OPERATIONS_STEP_STATUS, DEFAULT_GAS_PRICE } from '../../constants.js';
+import {
+    OPERATIONS_STEP_STATUS,
+    DEFAULT_GAS_PRICE,
+    DEFAULT_GAS_PRICE_GWEI,
+} from '../../constants.js';
 import emptyHooks from '../../util/empty-hooks.js';
 import { sleepForMilliseconds } from '../utilities.js';
 
@@ -113,11 +117,11 @@ export default class BlockchainServiceBase {
             } else if (blockchain.name.startsWith('base')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
             } else if (blockchain.name.startsWith('gnosis')) {
-                const response = await axios.get(blockchain.gasPriceOracleLink);
-                if (blockchain.name.split(':')[1] === '100') {
-                    gasPrice = Number(response.data.result, 10);
-                } else if (blockchain.name.split(':')[1] === '10200') {
-                    gasPrice = Math.round(response.data.average * 1e9);
+                try {
+                    const response = await axios.get(blockchain.gasPriceOracleLink);
+                    gasPrice = Number(response?.data?.average) * 1e9;
+                } catch (e) {
+                    gasPrice = DEFAULT_GAS_PRICE_GWEI.GNOSIS;
                 }
             } else {
                 gasPrice = Web3.utils.toWei(
@@ -224,7 +228,7 @@ export default class BlockchainServiceBase {
                 to: contractInstance.options.address,
                 data: encodedABI,
                 from: publicKey,
-                gasPrice,
+                gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
                 gas: gasLimit,
             });
         }
@@ -233,7 +237,7 @@ export default class BlockchainServiceBase {
             from: publicKey,
             to: contractInstance.options.address,
             data: encodedABI,
-            gasPrice,
+            gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
             gas: gasLimit,
         };
     }

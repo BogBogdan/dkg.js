@@ -78,7 +78,7 @@ export const BLOCKCHAINS = {
         'gnosis:100': {
             hubContract: '0x882D0BF07F956b1b94BBfe9E77F47c6fc7D4EC8f',
             rpc: 'https://rpc.gnosischain.com/',
-            gasPriceOracleLink: 'https://gnosis.blockscout.com/api/v1/gas-price-oracle',
+            gasPriceOracleLink: 'https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle',
         },
     },
 };
@@ -252,6 +252,10 @@ export const DEFAULT_PARAMETERS = {
 export const DEFAULT_GAS_PRICE = {
     GNOSIS: '20',
     OTP: '1',
+};
+
+export const DEFAULT_GAS_PRICE_GWEI = {
+    GNOSIS: '3500000000',
 };
 
 export const LOW_BID_SUGGESTION = 'low';
