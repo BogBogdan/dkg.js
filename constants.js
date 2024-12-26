@@ -66,7 +66,21 @@ export const BLOCKCHAINS = {
             gasPriceOracleLink: 'https://blockscout.chiadochain.net/api/v1/gas-price-oracle',
         },
     },
-    mainnet: {},
+    mainnet: {
+        'base:8453': {
+            hubContract: '0x99Aa571fD5e681c2D27ee08A7b7989DB02541d13',
+            rpc: 'https://mainnet.base.org',
+        },
+        'otp:2043': {
+            hubContract: '0x0957e25BD33034948abc28204ddA54b6E1142D6F',
+            rpc: 'https://astrosat-parachain-rpc.origin-trail.network',
+        },
+        'gnosis:100': {
+            hubContract: '0x882D0BF07F956b1b94BBfe9E77F47c6fc7D4EC8f',
+            rpc: 'https://rpc.gnosischain.com/',
+            gasPriceOracleLink: 'https://gnosis.blockscout.com/api/v1/gas-price-oracle',
+        },
+    },
 };
 
 export const PARANET_NODES_ACCESS_POLICY = {

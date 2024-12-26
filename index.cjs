@@ -70,7 +70,21 @@ const BLOCKCHAINS = {
             gasPriceOracleLink: 'https://blockscout.chiadochain.net/api/v1/gas-price-oracle',
         },
     },
-    mainnet: {},
+    mainnet: {
+        'base:8453': {
+            hubContract: '0x99Aa571fD5e681c2D27ee08A7b7989DB02541d13',
+            rpc: 'https://mainnet.base.org',
+        },
+        'otp:2043': {
+            hubContract: '0x0957e25BD33034948abc28204ddA54b6E1142D6F',
+            rpc: 'https://astrosat-parachain-rpc.origin-trail.network',
+        },
+        'gnosis:100': {
+            hubContract: '0x882D0BF07F956b1b94BBfe9E77F47c6fc7D4EC8f',
+            rpc: 'https://rpc.gnosischain.com/',
+            gasPriceOracleLink: 'https://gnosis.blockscout.com/api/v1/gas-price-oracle',
+        },
+    },
 };
 
 const PARANET_NODES_ACCESS_POLICY = {
@@ -843,7 +857,7 @@ class AssetOperationsManager {
 
         if (
             publishOperationResult.status !== OPERATION_STATUSES.COMPLETED &&
-            !publishOperationResult.minAcksReached
+            !publishOperationResult.data.minAcksReached
         ) {
             return {
                 datasetRoot,
@@ -880,12 +894,12 @@ class AssetOperationsManager {
             const stakeWeightedAverageAsk = await this.blockchainService.getStakeWeightedAverageAsk(
                 blockchain,
             );
-
             estimatedPublishingCost =
                 (BigInt(stakeWeightedAverageAsk) *
                     (BigInt(epochsNum) * BigInt(1e18) +
                         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
-                    (BigInt(datasetSize) / BigInt(1024))) /
+                    BigInt(datasetSize)) /
+                BigInt(1024) /
                 BigInt(1e18);
         }
         let knowledgeCollectionId;
@@ -3031,7 +3045,7 @@ class HttpService {
         } while (
             response.data.status !== OPERATION_STATUSES.COMPLETED &&
             response.data.status !== OPERATION_STATUSES.FAILED &&
-            !response.data.minAcksReached
+            !response.data.data?.minAcksReached
         );
         return response.data;
     }
