@@ -906,7 +906,6 @@ class AssetOperationsManager {
                 BigInt(1024) /
                 BigInt(1e18);
         }
-
         let knowledgeCollectionId;
         let mintKnowledgeAssetReceipt;
 
@@ -933,16 +932,6 @@ class AssetOperationsManager {
                 blockchain,
                 stepHooks,
             ));
-
-        const datasetSizeKB = datasetSize / 1024;
-
-        console.log(
-            `Blockchain: ${blockchain.name}\n` +
-                `Epochs num: ${epochsNum}\n` +
-                `Tx hash: ${mintKnowledgeAssetReceipt.transactionHash}\n` +
-                `Dataset Size KB: ${datasetSizeKB}\n` +
-                `Knowledge Assets Amount: ${assertionTools.kcTools.countDistinctSubjects(dataset.public)}`,
-        );
 
         const UAL = deriveUAL(blockchain.name, contentAssetStorageAddress, knowledgeCollectionId);
 
