@@ -112,11 +112,11 @@ export default class BlockchainServiceBase {
         try {
             let gasPrice;
 
-            if (blockchain.name.startsWith('otpp')) {
+            if (blockchain.name.startsWith('otp')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
-            } else if (blockchain.name.startsWith('basee')) {
+            } else if (blockchain.name.startsWith('base')) {
                 gasPrice = await web3Instance.eth.getGasPrice();
-            } else if (blockchain.name.startsWith('gnosiss')) {
+            } else if (blockchain.name.startsWith('gnosis')) {
                 try {
                     const response = await axios.get(blockchain.gasPriceOracleLink);
                     gasPrice =
