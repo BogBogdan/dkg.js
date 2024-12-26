@@ -6,7 +6,7 @@ import { createRequire } from 'module';
 import {
     OPERATIONS_STEP_STATUS,
     DEFAULT_GAS_PRICE,
-    DEFAULT_GAS_PRICE_GWEI,
+    DEFAULT_GAS_PRICE_WEI,
 } from '../../constants.js';
 import emptyHooks from '../../util/empty-hooks.js';
 import { sleepForMilliseconds } from '../utilities.js';
@@ -119,27 +119,31 @@ export default class BlockchainServiceBase {
             } else if (blockchain.name.startsWith('gnosis')) {
                 try {
                     const response = await axios.get(blockchain.gasPriceOracleLink);
-                    gasPrice = Number(response?.data?.average) * 1e9;
+                    gasPrice =
+                        Number(response?.data?.average) * 1e9 || DEFAULT_GAS_PRICE_WEI.GNOSIS;
                 } catch (e) {
-                    gasPrice = DEFAULT_GAS_PRICE_GWEI.GNOSIS;
+                    gasPrice = DEFAULT_GAS_PRICE_WEI.GNOSIS;
                 }
             } else {
-                gasPrice = Web3.utils.toWei(
-                    blockchain.name.startsWith('otp')
-                        ? DEFAULT_GAS_PRICE.OTP
-                        : DEFAULT_GAS_PRICE.GNOSIS,
-                    'Gwei',
-                );
+                if (blockchain.name.startsWith('otp')) {
+                    gasPrice = Web3.utils.toWei(DEFAULT_GAS_PRICE.OTP, 'Gwei');
+                } else if (blockchain.name.startsWith('base')) {
+                    gasPrice = Web3.utils.toWei(DEFAULT_GAS_PRICE.BASE, 'Gwei');
+                } else {
+                    gasPrice = Web3.utils.toWei(DEFAULT_GAS_PRICE.GNOSIS, 'Gwei');
+                }
             }
             return gasPrice;
         } catch (error) {
             // eslint-disable-next-line no-console
             console.warn(
-                `Failed to fetch the gas price from the network: ${error}. Using default value: 2 Gwei.`,
+                `Failed to fetch the gas price from the network: ${error}. Using default value.`,
             );
             return Web3.utils.toWei(
                 blockchain.name.startsWith('otp')
                     ? DEFAULT_GAS_PRICE.OTP
+                    : blockchain.name.startsWith('base')
+                    ? DEFAULT_GAS_PRICE.BASE
                     : DEFAULT_GAS_PRICE.GNOSIS,
                 'Gwei',
             );
@@ -228,7 +232,7 @@ export default class BlockchainServiceBase {
                 to: contractInstance.options.address,
                 data: encodedABI,
                 from: publicKey,
-                gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
+                gasPrice,
                 gas: gasLimit,
             });
         }
@@ -237,7 +241,7 @@ export default class BlockchainServiceBase {
             from: publicKey,
             to: contractInstance.options.address,
             data: encodedABI,
-            gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
+            gasPrice,
             gas: gasLimit,
         };
     }
@@ -1134,12 +1138,12 @@ export default class BlockchainServiceBase {
             return gasPrice;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.warn(
-                `Failed to fetch the gas price from the network: ${error}. Using default value: 2 Gwei.`,
-            );
+            console.warn(`Failed to fetch the gas price from the network: ${error}. `);
             return Web3.utils.toWei(
                 blockchain.name.startsWith('otp')
                     ? DEFAULT_GAS_PRICE.OTP
+                    : blockchain.name.startsWith('base')
+                    ? DEFAULT_GAS_PRICE.BASE
                     : DEFAULT_GAS_PRICE.GNOSIS,
                 'Gwei',
             );
