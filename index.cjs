@@ -82,7 +82,7 @@ const BLOCKCHAINS = {
         'gnosis:100': {
             hubContract: '0x882D0BF07F956b1b94BBfe9E77F47c6fc7D4EC8f',
             rpc: 'https://rpc.gnosischain.com/',
-            gasPriceOracleLink: 'https://gnosis.blockscout.com/api/v1/gas-price-oracle',
+            gasPriceOracleLink: 'https://blockscout.com/xdai/mainnet/api/v1/gas-price-oracle',
         },
     },
 };
@@ -230,6 +230,10 @@ const DEFAULT_PARAMETERS = {
 const DEFAULT_GAS_PRICE = {
     GNOSIS: '20',
     OTP: '1',
+};
+
+const DEFAULT_GAS_PRICE_GWEI = {
+    GNOSIS: '3500000000',
 };
 
 const LOW_BID_SUGGESTION = 'low';
@@ -3185,11 +3189,7 @@ class BlockchainServiceBase {
                 gasPrice = await web3Instance.eth.getGasPrice();
             } else if (blockchain.name.startsWith('gnosis')) {
                 const response = await axios.get(blockchain.gasPriceOracleLink);
-                if (blockchain.name.split(':')[1] === '100') {
-                    gasPrice = Number(response.data.result, 10);
-                } else if (blockchain.name.split(':')[1] === '10200') {
-                    gasPrice = Math.round(response.data.average * 1e9);
-                }
+                gasPrice = Number(response.data.average) * 1e9;
             } else {
                 gasPrice = Web3.utils.toWei(
                     blockchain.name.startsWith('otp')
@@ -3295,7 +3295,7 @@ class BlockchainServiceBase {
                 to: contractInstance.options.address,
                 data: encodedABI,
                 from: publicKey,
-                gasPrice,
+                gasPrice: isNaN(gasPrice) ? DEFAULT_GAS_PRICE_GWEI.GNOSIS : gasPrice,
                 gas: gasLimit,
             });
         }
@@ -3304,7 +3304,7 @@ class BlockchainServiceBase {
             from: publicKey,
             to: contractInstance.options.address,
             data: encodedABI,
-            gasPrice,
+            gasPrice: isNaN(gasPrice) ? DEFAULT_GAS_PRICE_GWEI.GNOSIS : gasPrice,
             gas: gasLimit,
         };
     }
