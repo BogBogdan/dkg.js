@@ -119,7 +119,7 @@ export default class BlockchainServiceBase {
             } else if (blockchain.name.startsWith('gnosis')) {
                 try {
                     const response = await axios.get(blockchain.gasPriceOracleLink);
-                    gasPrice = Number(response.data.average) * 1e9;
+                    gasPrice = Number(response?.data?.average) * 1e9;
                 } catch (e) {
                     gasPrice = DEFAULT_GAS_PRICE_GWEI.GNOSIS;
                 }
@@ -228,7 +228,7 @@ export default class BlockchainServiceBase {
                 to: contractInstance.options.address,
                 data: encodedABI,
                 from: publicKey,
-                gasPrice: isNaN(gasPrice) ? DEFAULT_GAS_PRICE_GWEI.GNOSIS : gasPrice,
+                gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
                 gas: gasLimit,
             });
         }
@@ -237,7 +237,7 @@ export default class BlockchainServiceBase {
             from: publicKey,
             to: contractInstance.options.address,
             data: encodedABI,
-            gasPrice: isNaN(gasPrice) ? DEFAULT_GAS_PRICE_GWEI.GNOSIS : gasPrice,
+            gasPrice: gasPrice ? gasPrice : DEFAULT_GAS_PRICE_GWEI.GNOSIS,
             gas: gasLimit,
         };
     }
