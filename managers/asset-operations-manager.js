@@ -444,7 +444,7 @@ export default class AssetOperationsManager {
 
         if (
             publishOperationResult.status !== OPERATION_STATUSES.COMPLETED &&
-            !publishOperationResult.minAcksReached
+            !publishOperationResult.data.minAcksReached
         ) {
             return {
                 datasetRoot,
@@ -486,6 +486,7 @@ export default class AssetOperationsManager {
                     (BigInt(epochsNum) * BigInt(1e18) +
                         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
                     BigInt(datasetSize)) /
+                BigInt(1024) /
                 BigInt(1e18);
         }
         let knowledgeCollectionId;

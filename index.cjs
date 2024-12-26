@@ -56,17 +56,16 @@ const BLOCKCHAINS = {
         },
     },
     testnet: {
-        // This is V8 TESTNET HUB don't use this for V6
         'base:84532': {
-            hubContract: '0x4A0aC589D7469868ff4EC889aa2c7eE43d30d823',
+            hubContract: '0xf21CE8f8b01548D97DCFb36869f1ccB0814a4e05',
             rpc: 'https://sepolia.base.org',
         },
         'otp:20430': {
-            hubContract: '0x94cb4Ce3C6ce3654b0dA47255a2325322DaD5552',
+            hubContract: '0xd7d073b560412c6A7F33dD670d323D01061E5DEb',
             rpc: 'https://lofar-testnet.origin-trail.network',
         },
         'gnosis:10200': {
-            hubContract: '0xC2d165484ee044aFCD0F693a84Ae57235FD986fA',
+            hubContract: '0x2c08AC4B630c009F709521e56Ac385A6af70650f',
             rpc: 'https://rpc.chiadochain.net',
             gasPriceOracleLink: 'https://blockscout.chiadochain.net/api/v1/gas-price-oracle',
         },
@@ -881,11 +880,12 @@ class AssetOperationsManager {
             const stakeWeightedAverageAsk = await this.blockchainService.getStakeWeightedAverageAsk(
                 blockchain,
             );
+
             estimatedPublishingCost =
                 (BigInt(stakeWeightedAverageAsk) *
                     (BigInt(epochsNum) * BigInt(1e18) +
                         (BigInt(timeUntilNextEpoch) * BigInt(1e18)) / BigInt(epochLength)) *
-                    BigInt(datasetSize)) /
+                    (BigInt(datasetSize) / BigInt(1024))) /
                 BigInt(1e18);
         }
         let knowledgeCollectionId;
