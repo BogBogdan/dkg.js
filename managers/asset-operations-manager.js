@@ -1,5 +1,5 @@
 import { kaTools, kcTools } from 'assertion-tools';
-import { ethers } from 'ethers';
+import { ethers, hashMessage, getBytes } from 'ethers';
 import {
     deriveUAL,
     getOperationStatusObject,
@@ -280,6 +280,18 @@ export default class AssetOperationsManager {
         return left;
     }
 
+    manualJoinSignature({ r, s, v }) {
+        // Remove the "0x" prefix from r and s
+        const rNoPrefix = r.replace(/^0x/, '');
+        const sNoPrefix = s.replace(/^0x/, '');
+
+        // Convert v to a 2-digit hex string (e.g. "1b" or "1c")
+        // If v is already 27 or 28, this should work fine.
+        const vHex = Number(v).toString(16).padStart(2, '0');
+
+        return '0x' + rNoPrefix + sNoPrefix + vHex;
+    }
+
     /**
      * Creates a new knowledge collection.
      * @async
@@ -431,7 +443,6 @@ export default class AssetOperationsManager {
             hashFunctionId,
             minimumNumberOfNodeReplications,
         );
-
         const publishOperationResult = await this.nodeApiService.getOperationResult(
             endpoint,
             port,
@@ -465,12 +476,28 @@ export default class AssetOperationsManager {
         const identityIds = [];
         const r = [];
         const vs = [];
+        await Promise.all(
+            signatures.map(async (signature) => {
+                try {
+                    const signerAddress = ethers.recoverAddress(
+                        hashMessage(getBytes(datasetRoot)),
+                        signature,
+                    );
 
-        signatures.forEach((signature) => {
-            identityIds.push(signature.identityId);
-            r.push(signature.r);
-            vs.push(signature.vs);
-        });
+                    let keyIsOperationalWallet;
+                    keyIsOperationalWallet = await this.blockchainService.keyIsOperationalWallet(
+                        blockchain,
+                        signature.identityId,
+                        signerAddress,
+                    );
+                    if (keyIsOperationalWallet) {
+                        identityIds.push(signature.identityId);
+                        r.push(signature.r);
+                        vs.push(signature.vs);
+                    }
+                } catch {}
+            }),
+        );
 
         let estimatedPublishingCost;
         if (tokenAmount) {

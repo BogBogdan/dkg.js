@@ -2,6 +2,7 @@
 /* eslint-disable no-await-in-loop */
 import Web3 from 'web3';
 import axios from 'axios';
+import { solidityPackedKeccak256 } from 'ethers';
 import { createRequire } from 'module';
 import {
     OPERATIONS_STEP_STATUS,
@@ -1183,6 +1184,21 @@ export default class BlockchainServiceBase {
 
     async epochLength(blockchain) {
         return this.callContractFunction('Chronos', 'epochLength', [], blockchain);
+    }
+
+    async keyIsOperationalWallet(blockchain, identityId, signer) {
+        const result = await this.callContractFunction(
+            'IdentityStorage',
+            'keyHasPurpose',
+            [
+                identityId,
+                solidityPackedKeccak256(['address'], [signer]),
+                2, // IdentityLib.OPERATIONAL_KEY
+            ],
+            blockchain,
+        );
+
+        return result;
     }
 
     convertToWei(ether) {
