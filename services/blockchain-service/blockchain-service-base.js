@@ -148,8 +148,8 @@ export default class BlockchainServiceBase {
                 blockchain.name.startsWith('otp')
                     ? DEFAULT_GAS_PRICE.OTP
                     : blockchain.name.startsWith('base')
-                    ? DEFAULT_GAS_PRICE.BASE
-                    : DEFAULT_GAS_PRICE.GNOSIS,
+                      ? DEFAULT_GAS_PRICE.BASE
+                      : DEFAULT_GAS_PRICE.GNOSIS,
                 'Gwei',
             );
         }
@@ -1148,8 +1148,8 @@ export default class BlockchainServiceBase {
                 blockchain.name.startsWith('otp')
                     ? DEFAULT_GAS_PRICE.OTP
                     : blockchain.name.startsWith('base')
-                    ? DEFAULT_GAS_PRICE.BASE
-                    : DEFAULT_GAS_PRICE.GNOSIS,
+                      ? DEFAULT_GAS_PRICE.BASE
+                      : DEFAULT_GAS_PRICE.GNOSIS,
                 'Gwei',
             );
         }
@@ -1211,43 +1211,50 @@ export default class BlockchainServiceBase {
 
     //Paymaster functions
     async deployPaymasterContract(blockchain) {
-
-        const paymasterAddress = await this.callContractFunction('PaymasterManager', 'constructor', [], blockchain);
-
-        let { id } = await this.decodeEventLogs(
-            paymasterAddress,
-            'deployPaymaster',
+        const paymasterAddress = await this.callContractFunction(
+            'PaymasterManager',
+            'constructor',
+            [],
             blockchain,
         );
 
+        let { id } = await this.decodeEventLogs(paymasterAddress, 'deployPaymaster', blockchain);
+
         return { deployPaymaster: id, paymasterAddress };
-
     }
 
-    async addAllowedAddressFunction(blockchain, public_adress) {
-
-        return this.callContractFunction('Paymaster', 'addAllowedAddress', [public_adress], blockchain);
+    async addAllowedAddress(blockchain, public_adress) {
+        return this.callContractFunction(
+            'Paymaster',
+            'addAllowedAddress',
+            [public_adress],
+            blockchain,
+        );
     }
 
-    async removeAllowedAddressFunction(blockchain, public_adress) {
-
-        return this.callContractFunction('Paymaster', 'removeAllowedAddress', [public_adress], blockchain);
+    async removeAllowedAddress(blockchain, public_adress) {
+        return this.callContractFunction(
+            'Paymaster',
+            'removeAllowedAddress',
+            [public_adress],
+            blockchain,
+        );
     }
 
-    async fundFunction(blockchain, tokenAmount) {
-        
-        return this.callContractFunction('Paymaster', 'fundPaymaster', [tokenAmount], blockchain);   
-    
+    async fundPaymaster(blockchain, tokenAmount) {
+        return this.callContractFunction('Paymaster', 'fundPaymaster', [tokenAmount], blockchain);
     }
 
-    async withdrawFunction(blockchain, recipient, tokenAmount) {
-
-        return this.callContractFunction('Paymaster', 'withdraw', [recipient, tokenAmount], blockchain);
+    async withdrawPaymaster(blockchain, recipient, tokenAmount) {
+        return this.callContractFunction(
+            'Paymaster',
+            'withdraw',
+            [recipient, tokenAmount],
+            blockchain,
+        );
     }
 
-    async coverCostFunction(blockchain, tokenAmount) {
-        
+    async coverCostPaymaster(blockchain, tokenAmount) {
         return this.callContractFunction('Paymaster', 'coverCost', [tokenAmount], blockchain);
     }
-
 }
