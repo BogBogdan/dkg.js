@@ -26,6 +26,7 @@ const KnowledgeCollectionAbi = require('dkg-evm-module/abi/KnowledgeCollection.j
 const KnowledgeCollectionStorageAbi = require('dkg-evm-module/abi/KnowledgeCollectionStorage.json');
 const AskStorageAbi = require('dkg-evm-module/abi/AskStorage.json');
 const ChronosAbi = require('dkg-evm-module/abi/Chronos.json');
+const PaymasterAbi = require('dkg-evm-module/abi/Paymaster.json');
 
 export default class BlockchainServiceBase {
     constructor(config = {}) {
@@ -50,6 +51,7 @@ export default class BlockchainServiceBase {
         this.abis.KnowledgeCollectionStorage = KnowledgeCollectionStorageAbi;
         this.abis.AskStorage = AskStorageAbi;
         this.abis.Chronos = ChronosAbi;
+        this.abis.Paymaster = PaymasterAbi;
 
         this.abis.KnowledgeCollectionStorage.filter((obj) => obj.type === 'event').forEach(
             (event) => {
@@ -1204,4 +1206,36 @@ export default class BlockchainServiceBase {
     convertToWei(ether) {
         return Web3.utils.toWei(ether.toString(), 'ether');
     }
+
+    //Paymaster functions
+    async addAllowedAddressPeymaster(blockchain, public_adress) {
+
+        //const public_adress = await this.getPublicKey(blockchain);
+
+        return this.callContractFunction('Paymaster', 'addAllowedAddress', [public_adress], blockchain);
+    }
+
+    async removeAllowedAddressPeymaster(blockchain, public_adress) {
+
+        //const public_adress = await this.getPublicKey(blockchain);
+
+        return this.callContractFunction('Paymaster', 'removeAllowedAddress', [public_adress], blockchain);
+    }
+
+    async fundPaymasterPeymaster(blockchain, tokenAmount) {
+        
+        return this.callContractFunction('Paymaster', 'fundPaymaster', [tokenAmount], blockchain);   
+    
+    }
+
+    async withdrawPeymaster(blockchain, recipient, tokenAmount) {
+
+        return this.callContractFunction('Paymaster', 'withdraw', [], blockchain, recipient, tokenAmount);
+    }
+
+    async coverCostPeymaster(blockchain, tokenAmount) {
+        
+        return this.callContractFunction('Paymaster', 'coverCost', [], blockchain, tokenAmount);
+    }
+
 }
