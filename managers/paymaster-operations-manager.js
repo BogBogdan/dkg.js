@@ -1,34 +1,31 @@
-import { ethers  } from 'ethers';
-import { resolveUAL  } from '../services/utilities.js';
-import { INCENTIVE_TYPE  } from '../constants.js';
 
 export default class PaymasterOperationsManager {
    
     constructor(services) {
         this.blockchainService = services.blockchainService;
         this.inputService = services.inputService;
-        this.nodeApiService = services.nodeApiService;
         this.validationService = services.validationService;
     }
 
     /**
- * Sets allowance to a given quantity of tokens.
  * @async
  * @param {BigInt} tokenAmount - The amount of tokens (Wei) to set the allowance.
  * @param {Object} [options={}] - Additional options for increasing allowance - currently only blockchain option expected.
  * @param {string} recipient - The address of the recipient (used for operations like withdrawal or funding).
- * @param {string} hubAddress - The address of the recipient (used for operations like withdrawal or funding).
  * @returns {Object} Object containing hash of blockchain transaction and status.
  */
 
-    async deployPaymasterContract(options, hubAddress) {
+    async deployPaymasterContract(options) {
         try {
 
             const blockchain = this.inputService.getBlockchain(options);
 
-            if(this.validationService.validateBlockchain(blockchain) && this.validationService.validateAddress(hubAddress))
+
+            if(this.validationService.validateBlockchain(blockchain))
             {
-                await this.blockchainService.deployPaymasterContractFunction(blockchain, hubAddress);
+                const paymasterAddress = await this.blockchainService.deployPaymasterContract(blockchain);
+                
+                return paymasterAddress;
             }
 
         } catch (error) {
@@ -36,15 +33,14 @@ export default class PaymasterOperationsManager {
         }
     }
 
-    async addAllowedAddress(options) {
+    async addAllowedAddress(addresToBeWhitelested, options) {
         try {
 
             const blockchain = this.inputService.getBlockchain(options);
-            const public_address = await this.blockchainService.getPublicKey(blockchain);
 
-            if(this.validationService.validateBlockchain(blockchain) && this.validationService.validateAddress(public_address))
+            if(this.validationService.validatePaymasterAdress(blockchain, addresToBeWhitelested))
             {
-                await this.blockchainService.addAllowedAddressFunction(blockchain, public_address);
+                await this.blockchainService.addAllowedAddress(blockchain, addresToBeWhitelested);
             }
            
         } catch (error) {
@@ -52,15 +48,15 @@ export default class PaymasterOperationsManager {
         }
     }
 
-    async removeAllowedAddress(options) {
+    async removeAllowedAddress(addresToBeWhitelested, options) {
         try {
 
             const blockchain = this.inputService.getBlockchain(options);
-            const public_address = await this.blockchainService.getPublicKey(blockchain);
+            
 
-            if(this.validationService.validateBlockchain(blockchain) && this.validationService.validateAddress(public_address))
+            if(this.validationService.validatePaymasterAdress(blockchain, addresToBeWhitelested))
             {
-                await this.blockchainService.removeAllowedAddressFunction(blockchain, public_address);
+                await this.blockchainService.removeAllowedAddress(blockchain, addresToBeWhitelested);
             }
 
         } catch (error) {
@@ -69,14 +65,14 @@ export default class PaymasterOperationsManager {
     }
 
 
-    async fundPaymaster(options, tokenAmount) {
+    async fundPaymaster(tokenAmount, options) {
         try {
 
             const blockchain = this.inputService.getBlockchain(options);
 
-            if(this.validationService.validateBlockchain(blockchain) && this.validationService.validateTokenAmount(tokenAmount))
+            if(this.validationService.validatePaymasterToken(blockchain,tokenAmount))
             {
-                await this.blockchainService.fundFunction(blockchain, tokenAmount);
+                await this.blockchainService.fund(blockchain, tokenAmount);
             }
 
         } catch (error) {
@@ -84,14 +80,14 @@ export default class PaymasterOperationsManager {
         }
     }
 
-    async withdraw(options, recipient, tokenAmount) {
+    async withdraw(recipient, tokenAmount, options) {
         try {
 
             const blockchain = this.inputService.getBlockchain(options);
 
-            if(this.validationService.validateBlockchain(blockchain) && this.validationService.validateTokenAmount(tokenAmount) &&  this.validationService.validateAddress(recipient))
+            if(this.validationService.validatePaymasterTokenAdress(blockchain, tokenAmount, recipient))
             {
-                await this.blockchainService.withdrawFunction(blockchain, recipient, tokenAmount);
+                await this.blockchainService.withdraw(blockchain, recipient, tokenAmount);
             }
             
         } catch (error) {
@@ -99,14 +95,14 @@ export default class PaymasterOperationsManager {
         }
     }
 
-    async coverCost(options, tokenAmount) {
+    async coverCost(tokenAmount, options) {
         try {
             
             const blockchain = this.inputService.getBlockchain(options);
 
-            if(this.validationService.validateBlockchain(blockchain) && this.validationService.validateTokenAmount(tokenAmount))
+            if(this.validationService.validatePaymasterToken(blockchain, tokenAmount))
             {
-                await this.blockchainService.coverCostFunction(blockchain, tokenAmount);
+                await this.blockchainService.coverCost(blockchain, tokenAmount);
             }
 
         } catch (error) {

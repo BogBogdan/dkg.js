@@ -773,4 +773,24 @@ export default class ValidationService {
             minimumNumberOfFinalizationConfirmations,
         );
     }
+
+    //Paymaster validator
+
+    validatePaymasterAdress(blockchain, hubAddress) {
+        this.validateBlockchain(blockchain);
+        this.validateAddress(hubAddress);
+    }
+    
+    validatePaymasterToken(blockchain, tokenAmount) {
+        this.validateBlockchain(blockchain);
+        this.validateTokenAmount(tokenAmount);
+    }
+
+    validatePaymasterTokenAdress(blockchain, tokenAmount, recipient) {
+        this.validateBlockchain(blockchain);
+        this.validateTokenAmount(tokenAmount);
+        this.validateAddress(recipient);
+    }
+
+    
 }
