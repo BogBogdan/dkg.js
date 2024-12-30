@@ -1208,32 +1208,33 @@ export default class BlockchainServiceBase {
     }
 
     //Paymaster functions
-    async addAllowedAddressPeymaster(blockchain, public_adress) {
+    async deployPaymasterContractFunction(blockchain, hubAddress) {
 
-        //const public_adress = await this.getPublicKey(blockchain);
+        return this.callContractFunction('Paymaster', 'constructor', [hubAddress], blockchain);
+    }
+
+    async addAllowedAddressFunction(blockchain, public_adress) {
 
         return this.callContractFunction('Paymaster', 'addAllowedAddress', [public_adress], blockchain);
     }
 
-    async removeAllowedAddressPeymaster(blockchain, public_adress) {
-
-        //const public_adress = await this.getPublicKey(blockchain);
+    async removeAllowedAddressFunction(blockchain, public_adress) {
 
         return this.callContractFunction('Paymaster', 'removeAllowedAddress', [public_adress], blockchain);
     }
 
-    async fundPaymasterPeymaster(blockchain, tokenAmount) {
+    async fundFunction(blockchain, tokenAmount) {
         
         return this.callContractFunction('Paymaster', 'fundPaymaster', [tokenAmount], blockchain);   
     
     }
 
-    async withdrawPeymaster(blockchain, recipient, tokenAmount) {
+    async withdrawFunction(blockchain, recipient, tokenAmount) {
 
         return this.callContractFunction('Paymaster', 'withdraw', [], blockchain, recipient, tokenAmount);
     }
 
-    async coverCostPeymaster(blockchain, tokenAmount) {
+    async coverCostFunction(blockchain, tokenAmount) {
         
         return this.callContractFunction('Paymaster', 'coverCost', [], blockchain, tokenAmount);
     }
