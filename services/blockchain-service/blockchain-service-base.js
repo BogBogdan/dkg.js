@@ -1211,16 +1211,16 @@ export default class BlockchainServiceBase {
 
     //Paymaster functions
     async deployPaymasterContract(blockchain) {
-        const paymasterAddress = await this.callContractFunction(
+        const paymasterAddressContract = await this.callContractFunction(
             'PaymasterManager',
             'constructor',
             [],
             blockchain,
         );
 
-        let { id } = await this.decodeEventLogs(paymasterAddress, 'deployPaymaster', blockchain);
+        let { paymasterAddress } = await this.decodeEventLogs(paymasterAddressContract, 'deployPaymaster', blockchain); 
 
-        return { deployPaymaster: id, paymasterAddress };
+        return paymasterAddress;
     }
 
     async addAllowedAddress(blockchain, public_adress) {
