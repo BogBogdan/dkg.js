@@ -16,7 +16,7 @@ export default class PaymasterOperationsManager {
     async deployPaymasterContract(options) {
         try {
             const blockchain = this.inputService.getBlockchain(options);
-
+            
             if (this.validationService.validateBlockchain(blockchain)) {
                 const paymasterAddress =
                     await this.blockchainService.deployPaymasterContract(blockchain);
@@ -31,7 +31,8 @@ export default class PaymasterOperationsManager {
     async addAllowedAddress(addresToBeWhitelested, options) {
         try {
             const blockchain = this.inputService.getBlockchain(options);
-
+            
+           
             if (
                 this.validationService.validatePaymasterAddress(blockchain, addresToBeWhitelested)
             ) {
@@ -46,7 +47,7 @@ export default class PaymasterOperationsManager {
         try {
             const blockchain = this.inputService.getBlockchain(options);
 
-            if (this.validationService.validatePaymasterAdress(blockchain, addresToBeWhitelested)) {
+            if (this.validationService.validatePaymasterAddress(blockchain, addresToBeWhitelested)) {
                 await this.blockchainService.removeAllowedAddress(
                     blockchain,
                     addresToBeWhitelested,

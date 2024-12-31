@@ -776,7 +776,7 @@ export default class ValidationService {
 
     //Paymaster validator
 
-    validatePaymasterAdress(blockchain, hubAddress) {
+    validatePaymasterAddress(blockchain, hubAddress) {
         this.validateBlockchain(blockchain);
         this.validateAddress(hubAddress);
     }
