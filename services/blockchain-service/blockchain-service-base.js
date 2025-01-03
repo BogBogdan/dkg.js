@@ -65,6 +65,18 @@ export default class BlockchainServiceBase {
                 };
             },
         );
+
+        this.abis.PaymasterManager.filter((obj) => obj.type === 'event').forEach(
+            (event) => {
+                const concatInputs = event.inputs.map((input) => input.internalType);
+
+                this.events[event.name] = {
+                    hash: Web3.utils.keccak256(`${event.name}(${concatInputs})`),
+                    inputs: event.inputs,
+                };
+
+            },
+        );
     }
 
     initializeWeb3() {
@@ -410,7 +422,7 @@ export default class BlockchainServiceBase {
         blockchain,
         stepHooks = emptyHooks,
     ) {
-        const sender = await this.getPublicKey(blockchain);
+        const sender = await this.getPublicKey(blockchain); 
         let serviceAgreementV1Address;
         let allowanceIncreased = false;
         let allowanceGap = 0;
@@ -1211,14 +1223,15 @@ export default class BlockchainServiceBase {
 
     //Paymaster functions
     async deployPaymasterContract(blockchain) {
-        const paymasterAddressContract = await this.callContractFunction(
+        const paymasterAddressContract = await this.executeContractFunction(
             'PaymasterManager',
-            'constructor',
+            'deployPaymaster',
             [],
             blockchain,
         );
 
-        let { paymasterAddress } = await this.decodeEventLogs(paymasterAddressContract, 'deployPaymaster', blockchain); 
+      
+        let { paymasterAddress } = await this.decodeEventLogs(paymasterAddressContract, 'PaymasterDeployed', blockchain); 
 
         return paymasterAddress;
     }
@@ -1254,7 +1267,4 @@ export default class BlockchainServiceBase {
         );
     }
 
-    async coverCostPaymaster(blockchain, tokenAmount) {
-        return this.callContractFunction('Paymaster', 'coverCost', [tokenAmount], blockchain);
-    }
 }

@@ -1,15 +1,16 @@
 import PaymasterOperationsManager from '../managers/paymaster-operations-manager.js';
 import BaseServiceManager from '../services/base-service-manager.js';
 
+const PUBLIC_KEY = '';
+const PRIVATE_KEY = '';
+
+
 const config = {
-    nodeApiUrl: 'https://example.com/api',  
+    //nodeApiUrl: 'https://example.com/api',  
     blockchain: {
-        network: 'Base',                      
-        name: 'Base',                         
-        hubContract: '0xYourDeployedContractAddressHere', 
-        rpc: 'https://base.rpc.url.here',      
-        publicKey: '0xYourBasePublicKeyHere',  
-        privateKey: '0xYourBasePrivateKeyHere'  
+        name: 'otp:20430',
+        publicKey: PUBLIC_KEY,
+        privateKey: PRIVATE_KEY,
     },
 };
 
@@ -28,16 +29,16 @@ const config = {
         const deployedAddress = await paymasterManager.deployPaymasterContract({ blockchain: 'Ethereum' });
         console.log('Deployed Address:', deployedAddress);
 
-        await paymasterManager.addAllowedAddress('0x1dD2C730a2BcD26d6aEf7DCCF171FC2AB1384d14', { blockchain: 'Ethereum' });
+        await paymasterManager.addAllowedAddress('0x404028D4Bda2B3f2558695A09a9a31dF138Dc5F6', { blockchain: 'Ethereum' });
         console.log('Added allowed address.');
 
-        await paymasterManager.removeAllowedAddress('0x1dD2C730a2BcD26d6aEf7DCCF171FC2AB1384d14', { blockchain: 'Ethereum' });
+        await paymasterManager.removeAllowedAddress('0x404028D4Bda2B3f2558695A09a9a31dF138Dc5F6', { blockchain: 'Ethereum' });
         console.log('Removed allowed address.');
 
         await paymasterManager.fundPaymaster(BigInt(1000000), { blockchain: 'Ethereum' });
         console.log('Funded Paymaster.');
 
-        await paymasterManager.withdraw('0x1dD2C730a2BcD26d6aEf7DCCF171FC2AB1384d14', BigInt(500000), { blockchain: 'Ethereum' });
+        await paymasterManager.withdraw('0x404028D4Bda2B3f2558695A09a9a31dF138Dc5F6', BigInt(500000), { blockchain: 'Ethereum' });
         console.log('Withdrawal complete.');
 
         await paymasterManager.coverCost(BigInt(200000), { blockchain: 'Ethereum' });

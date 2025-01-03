@@ -605,7 +605,6 @@ export default class ValidationService {
         this.validateTransactionPollingTimeout(blockchain.transactionPollingTimeout);
         if (nodeSupported()) {
             this.validateRequiredParam('blockchain rpc', blockchain.rpc);
-
             if (operation !== OPERATIONS.GET) {
                 this.validateRequiredParam('blockchain public key', blockchain.publicKey);
                 this.validateRequiredParam('blockchain private key', blockchain.privateKey);

@@ -16,13 +16,13 @@ export default class PaymasterOperationsManager {
     async deployPaymasterContract(options) {
         try {
             const blockchain = this.inputService.getBlockchain(options);
-            
-            if (this.validationService.validateBlockchain(blockchain)) {
-                const paymasterAddress =
-                    await this.blockchainService.deployPaymasterContract(blockchain);
+          
+            this.validationService.validateBlockchain(blockchain);
 
-                return paymasterAddress;
-            }
+            const paymasterAddress = await this.blockchainService.deployPaymasterContract(blockchain);
+
+            return paymasterAddress;
+         
         } catch (error) {
             console.error('Error deploying Paymaster contract:', error);
         }
@@ -31,13 +31,11 @@ export default class PaymasterOperationsManager {
     async addAllowedAddress(addresToBeWhitelested, options) {
         try {
             const blockchain = this.inputService.getBlockchain(options);
-            
+                
+            this.validationService.validatePaymasterAddress(blockchain, addresToBeWhitelested);
            
-            if (
-                this.validationService.validatePaymasterAddress(blockchain, addresToBeWhitelested)
-            ) {
-                await this.blockchainService.addAllowedAddress(blockchain, addresToBeWhitelested);
-            }
+            await this.blockchainService.addAllowedAddress(blockchain, addresToBeWhitelested);
+          
         } catch (error) {
             console.error('Error adding allowed address:', error);
         }
@@ -47,12 +45,10 @@ export default class PaymasterOperationsManager {
         try {
             const blockchain = this.inputService.getBlockchain(options);
 
-            if (this.validationService.validatePaymasterAddress(blockchain, addresToBeWhitelested)) {
-                await this.blockchainService.removeAllowedAddress(
-                    blockchain,
-                    addresToBeWhitelested,
-                );
-            }
+            this.validationService.validatePaymasterAddress(blockchain, addresToBeWhitelested);
+                
+            await this.blockchainService.removeAllowedAddress(blockchain, addresToBeWhitelested);
+
         } catch (error) {
             console.error('Error removing allowed address:', error);
         }
@@ -62,9 +58,10 @@ export default class PaymasterOperationsManager {
         try {
             const blockchain = this.inputService.getBlockchain(options);
 
-            if (this.validationService.validatePaymasterToken(blockchain, tokenAmount)) {
-                await this.blockchainService.fundPaymaster(blockchain, tokenAmount);
-            }
+            this.validationService.validatePaymasterToken(blockchain, tokenAmount);
+
+            await this.blockchainService.fundPaymaster(blockchain, tokenAmount);
+
         } catch (error) {
             console.error('Error funding paymaster:', error);
         }
@@ -74,29 +71,17 @@ export default class PaymasterOperationsManager {
         try {
             const blockchain = this.inputService.getBlockchain(options);
 
-            if (
-                this.validationService.validatePaymasterTokenAdress(
-                    blockchain,
-                    tokenAmount,
-                    recipient,
-                )
-            ) {
-                await this.blockchainService.withdrawPaymaster(blockchain, recipient, tokenAmount);
-            }
+            this.validationService.validatePaymasterTokenAdress(
+                blockchain,
+                tokenAmount,
+                recipient,
+            )
+            
+            await this.blockchainService.withdrawPaymaster(blockchain, recipient, tokenAmount);
+           
         } catch (error) {
             console.error('Error withdrawing:', error);
         }
     }
 
-    async coverCost(tokenAmount, options) {
-        try {
-            const blockchain = this.inputService.getBlockchain(options);
-
-            if (this.validationService.validatePaymasterToken(blockchain, tokenAmount)) {
-                await this.blockchainService.coverCostPaymaster(blockchain, tokenAmount);
-            }
-        } catch (error) {
-            console.error('Error covering cost:', error);
-        }
-    }
 }
