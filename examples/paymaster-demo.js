@@ -3,7 +3,7 @@ import DKG from '../index.js';
 import { sleepForMilliseconds } from '../services/utilities.js';
 
 const ENVIRONMENT = 'testnet';
-const OT_NODE_HOSTNAME = 'https://v6-pegasus-node-06.origin-trail.network';
+const OT_NODE_HOSTNAME = 'https://v6-pegasus-node-02.origin-trail.network';
 const OT_NODE_PORT = '8900';
 const PUBLIC_KEY = '';
 const PRIVATE_KEY = '';
@@ -56,15 +56,19 @@ function divider() {
 
     //Publish paymaster
 
-    // const deployedAddress = await DkgClient.paymaster.deployPaymasterContract({
-    //     epochsNum: 2,
-    //     minimumNumberOfFinalizationConfirmations: 3,
-    //     minimumNumberOfNodeReplications: 3,
-    // });
+    const paymasterAddress = await DkgClient.paymaster.deployPaymasterContract({
+        epochsNum: 2,
+        minimumNumberOfFinalizationConfirmations: 3,
+        minimumNumberOfNodeReplications: 3,
+    });
     
-    // console.log('Deployed Address:', deployedAddress);
+    console.log('Deployed Address:', paymasterAddress);
 
-    await DkgClient.paymaster.addAllowedAddress('0x1d23852331eDA24d1b6F5E21fdc419A38B0de28c',);
+    await DkgClient.paymaster.addAllowedAddress(paymasterAddress, '0x1d23852331eDA24d1b6F5E21fdc419A38B0de28c',{
+        epochsNum: 2,
+        minimumNumberOfFinalizationConfirmations: 3,
+        minimumNumberOfNodeReplications: 3,
+    });
     console.log('Added allowed address.');
 
     // await DkgClient.paymaster.removeAllowedAddress('0x404028D4Bda2B3f2558695A09a9a31dF138Dc5F6', {
@@ -87,8 +91,6 @@ function divider() {
         minimumNumberOfFinalizationConfirmations: 3,
         minimumNumberOfNodeReplications: 3,
     });
-    
-    //
 
 
     console.time('Publish (5 replications, 5 finalizations)');

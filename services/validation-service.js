@@ -775,18 +775,21 @@ export default class ValidationService {
 
     //Paymaster validator
 
-    validatePaymasterAddress(blockchain, hubAddress) {
+    validatePaymasterAddress(blockchain, paymasterAddress, hubAddress) {
         this.validateBlockchain(blockchain);
+        this.validateAddress(paymasterAddress);
         this.validateAddress(hubAddress);
     }
     
-    validatePaymasterToken(blockchain, tokenAmount) {
+    validatePaymasterToken(blockchain, paymasterAddress, tokenAmount) {
         this.validateBlockchain(blockchain);
+        this.validateAddress(paymasterAddress);
         this.validateTokenAmount(tokenAmount);
     }
 
-    validatePaymasterTokenAdress(blockchain, tokenAmount, recipient) {
+    validatePaymasterTokenAdress(blockchain, paymasterAddress, tokenAmount, recipient) {
         this.validateBlockchain(blockchain);
+        this.validateAddress(paymasterAddress);
         this.validateTokenAmount(tokenAmount);
         this.validateAddress(recipient);
     }

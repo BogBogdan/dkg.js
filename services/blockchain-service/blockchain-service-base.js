@@ -194,6 +194,44 @@ export default class BlockchainServiceBase {
         }
     }
 
+    async callContractFunctionPaymaster(paymasterAddress, contractName, functionName, args, blockchain) {
+        await this.ensureBlockchainInfo(blockchain);
+
+        const web3Instance = await this.getWeb3Instance(blockchain);
+        
+        let paymasterContractInstance = new web3Instance.eth.Contract(
+            this.abis[contractName],
+            paymasterAddress,
+            { from: blockchain.publicKey },                     
+        )
+
+        try {
+            return await paymasterContractInstance.methods[functionName](...args).call();
+        } catch (error) {
+            if (/revert|VM Exception/i.test(error.message)) {
+                let status;
+                try {
+                    status = await paymasterContractInstance.methods.status().call();
+                } catch (_) {
+                    status = false;
+                }
+
+                if (!status && contractName !== 'ParanetNeuroIncentivesPool') {
+                    await this.updateContractInstance(contractName, blockchain, true);
+                    let paymasterContractInstance = new web3Instance.eth.Contract(
+                        this.abis[contractName],
+                        this[blockchain.name].contractAddress[blockchain.hubContract][contractName],
+                        { from: blockchain.publicKey },
+                    )
+
+                    return paymasterContractInstance.methods[functionName](...args).call();
+                }
+            }
+
+            throw error;
+        }
+    }
+
     async prepareTransaction(contractInstance, functionName, args, blockchain) {
         await this.ensureBlockchainInfo(blockchain);
         const web3Instance = await this.getWeb3Instance(blockchain);
@@ -1236,8 +1274,9 @@ export default class BlockchainServiceBase {
         return paymasterAddress;
     }
 
-    async addAllowedAddress(blockchain, public_adress) {
-        return this.callContractFunction(
+    async addAllowedAddress(blockchain, paymasterAddress, public_adress) {
+        return this.callContractFunctionPaymaster(
+            paymasterAddress,
             'Paymaster',
             'addAllowedAddress',
             [public_adress],
@@ -1245,8 +1284,9 @@ export default class BlockchainServiceBase {
         );
     }
 
-    async removeAllowedAddress(blockchain, public_adress) {
-        return this.callContractFunction(
+    async removeAllowedAddress(blockchain, paymasterAddress, public_adress) {
+        return this.callContractFunctionPaymaster(
+            paymasterAddress,
             'Paymaster',
             'removeAllowedAddress',
             [public_adress],
@@ -1254,12 +1294,18 @@ export default class BlockchainServiceBase {
         );
     }
 
-    async fundPaymaster(blockchain, tokenAmount) {
-        return this.callContractFunction('Paymaster', 'fundPaymaster', [tokenAmount], blockchain);
+    async fundPaymaster(blockchain, paymasterAddress, tokenAmount) {
+        return this.callContractFunctionPaymaster(
+            paymasterAddress,
+            'Paymaster', 
+            'fundPaymaster', 
+            [tokenAmount], 
+            blockchain);
     }
 
-    async withdrawPaymaster(blockchain, recipient, tokenAmount) {
-        return this.callContractFunction(
+    async withdrawPaymaster(blockchain, paymasterAddress, recipient, tokenAmount) {
+        return this.callContractFunctionPaymaster(
+            paymasterAddress,
             'Paymaster',
             'withdraw',
             [recipient, tokenAmount],
