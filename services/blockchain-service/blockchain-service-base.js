@@ -198,15 +198,24 @@ export default class BlockchainServiceBase {
         await this.ensureBlockchainInfo(blockchain);
 
         const web3Instance = await this.getWeb3Instance(blockchain);
+        const publicKey = await this.getPublicKey(blockchain);
+
+        // const account = web3Instance.eth.accounts.privateKeyToAccount("8ae4f7c247ad422913c1c60187856091ad2bcb4e53fb2936d7633d7d02bd180a");
+
+        // web3Instance.eth.accounts.wallet.add(account); 
         
         let paymasterContractInstance = new web3Instance.eth.Contract(
             this.abis[contractName],
             paymasterAddress,
-            { from: blockchain.publicKey },                     
+            { from: publicKey },                     
         )
 
         try {
-            return await paymasterContractInstance.methods[functionName](...args).call();
+            return await paymasterContractInstance.methods[functionName](...args).send({
+                from: publicKey,
+                gas: 100000,
+            });
+        
         } catch (error) {
             if (/revert|VM Exception/i.test(error.message)) {
                 let status;
@@ -232,17 +241,76 @@ export default class BlockchainServiceBase {
         }
     }
 
+    async executeContractFunctionPaymaster(paymasterAddress, contractName, functionName, args, blockchain) {
+        await this.ensureBlockchainInfo(blockchain);
+        
+        const web3Instance = await this.getWeb3Instance(blockchain);
+        const publicKey = await this.getPublicKey(blockchain);
+
+        let paymasterContractInstance = new web3Instance.eth.Contract(
+            this.abis[contractName],
+            paymasterAddress,
+            { from: publicKey },                     
+        )
+
+       // let paymasterContractInstance = await this.getContractInstance(contractName, blockchain);
+        
+       let tx;
+
+        try {
+       
+            tx = await this.prepareTransaction(paymasterContractInstance, functionName, args, blockchain);
+        
+            let receipt = await paymasterContractInstance.methods[functionName](...args).send(tx);
+            if (blockchain.name.startsWith('otp') && blockchain.waitNeurowebTxFinalization) {
+                receipt = await this.waitForTransactionFinalization(receipt, blockchain);
+            }
+
+            console.log(receipt);
+            return receipt;
+        } catch (error) {
+            if (/revert|VM Exception/i.test(error.message)) {
+                let status;
+                try {
+                    status = await paymasterContractInstance.methods.status().call();
+                } catch (_) {
+                    status = false;
+                }
+
+                if (!status) {
+                    await this.updateContractInstance(contractName, blockchain, true);
+                    paymasterContractInstance = await this.getContractInstance(contractName, blockchain);
+                    const web3Instance = await this.getWeb3Instance(blockchain);
+
+                    await web3Instance.eth.call({
+                        to: paymasterContractInstance.options.address,
+                        data: tx.data,
+                        from: tx.from,
+                    });
+
+                    return paymasterContractInstance.methods[functionName](...args).send(tx);
+                }
+            }
+
+            throw error;
+        }
+    }
+
     async prepareTransaction(contractInstance, functionName, args, blockchain) {
         await this.ensureBlockchainInfo(blockchain);
         const web3Instance = await this.getWeb3Instance(blockchain);
         const publicKey = await this.getPublicKey(blockchain);
         const encodedABI = await contractInstance.methods[functionName](...args).encodeABI();
 
+        console.log(contractInstance.methods)
+
         let gasLimit = Number(
             await contractInstance.methods[functionName](...args).estimateGas({
                 from: publicKey,
             }),
         );
+
+        
         gasLimit = Math.round(gasLimit * blockchain.gasLimitMultiplier);
 
         let gasPrice;
@@ -1275,7 +1343,7 @@ export default class BlockchainServiceBase {
     }
 
     async addAllowedAddress(blockchain, paymasterAddress, public_adress) {
-        return this.callContractFunctionPaymaster(
+        return this.executeContractFunctionPaymaster(
             paymasterAddress,
             'Paymaster',
             'addAllowedAddress',
@@ -1285,7 +1353,7 @@ export default class BlockchainServiceBase {
     }
 
     async removeAllowedAddress(blockchain, paymasterAddress, public_adress) {
-        return this.callContractFunctionPaymaster(
+        return this.executeContractFunctionPaymaster(
             paymasterAddress,
             'Paymaster',
             'removeAllowedAddress',
@@ -1295,7 +1363,7 @@ export default class BlockchainServiceBase {
     }
 
     async fundPaymaster(blockchain, paymasterAddress, tokenAmount) {
-        return this.callContractFunctionPaymaster(
+        return this.executeContractFunctionPaymaster(
             paymasterAddress,
             'Paymaster', 
             'fundPaymaster', 
@@ -1304,7 +1372,8 @@ export default class BlockchainServiceBase {
     }
 
     async withdrawPaymaster(blockchain, paymasterAddress, recipient, tokenAmount) {
-        return this.callContractFunctionPaymaster(
+
+        return this.executeContractFunctionPaymaster(
             paymasterAddress,
             'Paymaster',
             'withdraw',
